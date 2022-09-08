@@ -36,7 +36,8 @@ phones?.forEach(phone =>{
         <div class="card-body">
          <h5 class="card-title">${phone.phone_name}</h5>
         <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-      <button onclick="loadPhoneDeatils('${phone.slug}')" href="#" class="btn btn-primary">show Details</button>
+      <button onclick="loadPhoneDeatils('${phone.slug}')" href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#phoneDetailModal">show Details</button>
+     
         </div>
      </div>
     `;
@@ -58,6 +59,15 @@ document.getElementById('btn-search').addEventListener('click', function(){
     processSearch (10); 
 });
 
+// search input field enter key handler
+document.getElementById('search-field').addEventListener('keypress', function(e){
+  // console.log(e.key);
+  if (e.key === 'Enter'){
+    // code for enter
+    processSearch (10); 
+  }
+})
+
 const toggleSpinner = isLoading  => {
   const loaderSection = document.getElementById('loader');
   if(isLoading){
@@ -72,8 +82,29 @@ document.getElementById('show-all').addEventListener('click',function(){
   processSearch();
 });
 
-const loadPhoneDeatils = id =>{
-const url = ``;
+const loadPhoneDeatils = async id =>{
+const url = ` https://openapi.programming-hero.com/api/phone/${id}`;
+const res = await fetch(url);
+const data = await res.json();
+displayPhoneDetails(data.data);
+
 }
 
-loadPhone('nova');
+const displayPhoneDetails = phone =>{
+  console.log(phone);
+  const modalTitle = document.getElementById('phoneDetailModalLabel')
+  modalTitle.innerText = phone.name;
+  const phoneDetails = document.getElementById('phone-details');
+  // const details = document.createElement('p');
+  // details.innerText = `Release Date: `
+  phoneDetails.innerHTML = `
+  <p>Release Date: ${phone.releaseDate ? phone.releaseDate : 'No Release Date Found'}</p>
+  <p>Storage: ${phone.mainFeatures ? phone.mainFeatures.storage : 'No Storage information Found'}
+  <p>Others: ${phone.others ? phone.others.Bluetooth : 'No Bluetooth Information'}</p>
+ 
+
+  `
+  // phoneDetails.appendChild(details)
+}
+
+loadPhone('apple');
