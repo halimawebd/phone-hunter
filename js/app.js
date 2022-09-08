@@ -1,26 +1,33 @@
-const loadPhone = async (searchText) =>{
+const loadPhone = async (searchText, dataLimit) =>{
    const url = `https://openapi.programming-hero.com/api/phones?search=${searchText}`
    const res = await fetch(url)
    const data = await res.json();
-   displayPhone(data.data);
+   displayPhone(data.data,dataLimit);
+   console.log(data)
 
 }
-const displayPhone = phones =>{
+const displayPhone = (phones, dataLimit) =>{
   const phonesContainer = document.getElementById('phones-container');
   phonesContainer.textContent = '';
-  // display 20 phones only
-  phones = phones.slice(0, 10);
-
-  // display no phones found
+  // display 10 phones only
+  const showAll = document.getElementById('show-all');
+  if(dataLimit && phones.length > 10){
+    phones = phones.slice(0, 10);
+    showAll.classList.remove('d-none');
+  }
+  else{
+    showAll.classList.add('d-none');
+  }
+// display no phones found
   const noPhone = document.getElementById('no-found-message')
-  if(phones.length === 0){
+  if(phones){
     noPhone.classList.remove('d-none')
 }
 else{
   noPhone.classList.add('d-none');
 }
   // display all phones
-phones.forEach(phone =>{
+phones?.forEach(phone =>{
     const phoneDiv = document.createElement('div');
     phoneDiv.classList.add('col');
     phoneDiv.innerHTML = `
@@ -29,6 +36,7 @@ phones.forEach(phone =>{
         <div class="card-body">
          <h5 class="card-title">${phone.phone_name}</h5>
         <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+      <button onclick="loadPhoneDeatils('${phone.slug}')" href="#" class="btn btn-primary">show Details</button>
         </div>
      </div>
     `;
@@ -38,16 +46,19 @@ phones.forEach(phone =>{
     // stop spinner loader
     toggleSpinner(false);
 }
-// handle search button click
-document.getElementById('btn-search').addEventListener('click', function(){
-    // strat loader
+  const processSearch = (dataLimit) =>{
     toggleSpinner(true);
     const searchField = document.getElementById('search-field');
     const searchText = searchField.value;
-    loadPhone(searchText);
+    loadPhone(searchText, dataLimit);
+  }
+// handle search button click
+document.getElementById('btn-search').addEventListener('click', function(){
+    // strat loader
+    processSearch (10); 
 });
 
-const toggleSpinner = isLoading  =>{
+const toggleSpinner = isLoading  => {
   const loaderSection = document.getElementById('loader');
   if(isLoading){
     loaderSection.classList.remove('d-none')
@@ -56,5 +67,13 @@ const toggleSpinner = isLoading  =>{
     loaderSection.classList.add('d-none');
   }
 }
+// not the best way to load show all
+document.getElementById('show-all').addEventListener('click',function(){
+  processSearch();
+});
 
-// loadPhone();
+const loadPhoneDeatils = id =>{
+const url = ``;
+}
+
+loadPhone('nova');
